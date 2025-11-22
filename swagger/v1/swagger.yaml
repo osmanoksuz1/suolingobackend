@@ -1,0 +1,189 @@
+---
+openapi: 3.0.1
+info:
+  title: Suolingo API
+  version: v1
+  description: API for Suolingo language learning application
+paths:
+  "/api/v1/lessons":
+    post:
+      summary: Creates a lesson
+      tags:
+      - Lessons
+      parameters: []
+      responses:
+        '201':
+          description: lesson created
+        '400':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_id:
+                  type: integer
+                lesson_text:
+                  type: string
+                difficulty_level:
+                  type: string
+                  enum:
+                  - beginner
+                  - intermediate
+                  - advanced
+              required:
+              - profile_id
+              - lesson_text
+              - difficulty_level
+  "/api/v1/profiles":
+    post:
+      summary: Creates a profile
+      tags:
+      - Profiles
+      parameters: []
+      responses:
+        '201':
+          description: profile created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      profile_photo_url:
+                        type: string
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+        '400':
+          description: invalid request
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+        required: true
+  "/api/v1/profiles/{id}":
+    get:
+      summary: Retrieves a profile
+      tags:
+      - Profiles
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: profile found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      voice_samples:
+                        type: array
+        '404':
+          description: profile not found
+  "/api/v1/videos/generate":
+    post:
+      summary: Generates a video
+      tags:
+      - Videos
+      parameters: []
+      responses:
+        '202':
+          description: video generation started
+        '400':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_id:
+                  type: integer
+                lesson_id:
+                  type: integer
+                voice_sample_id:
+                  type: integer
+              required:
+              - profile_id
+              - lesson_id
+              - voice_sample_id
+  "/api/v1/videos/{id}/status":
+    get:
+      summary: Checks video generation status
+      tags:
+      - Videos
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: status found
+        '404':
+          description: video not found
+  "/api/v1/voice_samples":
+    post:
+      summary: Uploads a voice sample
+      tags:
+      - Voice Samples
+      parameters: []
+      responses:
+        '201':
+          description: voice sample uploaded
+        '400':
+          description: invalid request
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: integer
+        required: true
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3000
+components:
+  schemas:
+    error_response:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
